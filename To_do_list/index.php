@@ -380,6 +380,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit-task_name']) && 
             /* Space between buttons */
         }
 
+        .logout-btn {
+            width: auto;
+            /* Set width to auto for a smaller button */
+            padding: 6px 10px;
+            /* Reduce padding */
+            background-color: #dc3545;
+            /* Red background */
+            color: white;
+            /* White text */
+            border: none;
+            /* No border */
+            border-radius: 4px;
+            /* Rounded corners */
+            font-size: 14px;
+            /* Smaller font size */
+            cursor: pointer;
+            /* Pointer cursor */
+            transition: background-color 0.3s ease;
+            /* Smooth transition */
+            margin-top: 10px;
+            /* Space above */
+        }
+
+        .logout-btn:hover {
+            background-color: #c82333;
+            /* Darker red on hover */
+        }
+
         /* Add Task Button */
         .add-task-btn {
             background-color: #4CAF50;
@@ -408,7 +436,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit-task_name']) && 
         /* Dropdown Menu Styling */
         .menu-actions {
             position: relative;
-            /* Position for dropdown */
+            /* Position relative to the project item */
             display: inline-block;
             /* Inline block for layout */
         }
@@ -431,10 +459,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit-task_name']) && 
             /* Hidden by default */
             position: absolute;
             /* Absolute positioning */
-            top: 100%;
-            /* Position below the toggle button */
-            right: 0;
-            /* Align to the right */
+            top: 0;
+            /* Align to the top of the project item */
+            right: -120px;
+            /* Position to the right of the project item */
             background-color: #ffffff;
             /* White background */
             border: 1px solid #ccc;
@@ -501,19 +529,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit-task_name']) && 
             <h2>Projects</h2>
             <ul class="menu" id="project-list">
                 <li class="menu-item">
-                    <a href="index.php">All Projects</a>
+                    <div class="project-item">
+                        <span class="project-button <?= $project_id === 0 ? 'active' : '' ?>"
+                            onclick="loadAllProjects()">All Projects</span>
+                    </div>
                 </li>
                 <?php while ($project = $resultProjects->fetch_assoc()) { ?>
                     <li class="menu-item">
-                        <a href="index.php?project_id=<?= $project['id']; ?>">
-                            <?= htmlspecialchars($project['name']); ?>
-                        </a>
-                        <div class="menu-actions">
-                            <button class="menu-toggle" onclick="toggleDropdown(<?= $project['id']; ?>)">⋮</button>
-                            <div class="dropdown-menu" id="dropdown-<?= $project['id']; ?>" style="display: none;">
-                                <button
-                                    onclick="openEditProjectModal(<?= $project['id']; ?>, '<?= htmlspecialchars($project['name']); ?>')">Edit</button>
-                                <button onclick="confirmDeleteProject(<?= $project['id']; ?>)">Delete</button>
+                        <div class="project-item">
+                            <span class="project-button <?= $project_id == $project['id'] ? 'active' : '' ?>"
+                                onclick="loadProjectTasks(<?= $project['id']; ?>)">
+                                <?= htmlspecialchars($project['name']); ?>
+                            </span>
+                            <div class="menu-actions">
+                                <button class="menu-toggle" onclick="toggleDropdown(<?= $project['id']; ?>)">⋮</button>
+                                <div class="dropdown-menu" id="dropdown-<?= $project['id']; ?>" style="display: none;">
+                                    <button
+                                        onclick="openEditProjectModal(<?= $project['id']; ?>, '<?= htmlspecialchars($project['name']); ?>')">Edit</button>
+                                    <button onclick="confirmDeleteProject(<?= $project['id']; ?>)">Delete</button>
+                                </div>
                             </div>
                         </div>
                     </li>
@@ -528,7 +562,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit-task_name']) && 
                 </form>
             <?php } ?>
         </aside>
-
 
         <main class="content">
             <h1>Tasks for
@@ -583,7 +616,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit-task_name']) && 
                         </div>
                     <?php } ?>
                 <?php } else { ?>
-                    <p>No tasks available for this project.</p>
+                    <p>No tasks available</p>
                 <?php } ?>
             </div>
         </main>
@@ -714,8 +747,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit-task_name']) && 
 
 
     <script>
-
-
         function openEditProductModal(productId, productName, productPrice, productDescription) {
             document.getElementById('edit-product_name').value = productName;
             document.getElementById('edit-product_price').value = productPrice;
@@ -980,6 +1011,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit-task_name']) && 
                 window.location.href = `delete_project.php?project_id=${projectId}`;
             }
         }
+
+        function loadAllProjects() {
+            window.location.href = 'index.php'; // Load all projects
+        }
+
+        function loadProjectTasks(projectId) {
+            window.location.href = 'index.php?project_id=' + projectId; // Load specific project tasks
+        }
+
+
     </script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
